@@ -4,16 +4,13 @@
 Author: zhulin (china10s)
 Usage: python patch.py
 Description:
-            Automatically pack reactnative jsbundle and different package,directory structure：
+Automatically pack reactnative jsbundle and different package,directory structure：
              -Root
-                -[ios]                              //ios 目录
-                -[android]
-                -[node_modules]
                 -package.json
                 -index.ios.js
                 -index.android.js
                 -[bundlePatch]
-                   -[bundles]                       //源文件目录
+                   -[bundles]                       //source floder
                       -1_0_0
                          -ios
                             -assets
@@ -28,17 +25,22 @@ Description:
                          -android
                             -drawable-mdpi
                             -android.jsbundle
-                   -[patches]                       //差异包目录
+                   -[patches]                       //differ patch
                       -1_0_0
                       -1_0_1
                          -ios
                             -1_0_0-1_0_1.zip
                          -android
                             -1_0_0-1_0_1.zip
-                   -[patchtask]                     //任务脚本
+                   -[patchtask]                     //job
                       -build
-                      patch.py                      //脚本入口
-                      diff_match_patch.py           //打包算法
+                      patch.py                      //main function
+                      patchImageFile.py
+                      patchJSBuild.py
+                      patchJSFile.py
+                      patchCompare.py
+                      patchZip.py
+                      diff_match_patch.py
 Version: 1.0
 """
 
