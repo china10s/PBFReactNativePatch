@@ -1,7 +1,7 @@
 # PBFReactNativePatch
-A simple pactch script for reactnative project to build jsbundle and make diff file against every older versions.
+A simple patch script for reactnative project to build jsbundle and make diff file against every older versions.
 
-## patch floder ##
+## Patch floder ##
 
     Automatically pack reactnative jsbundle and different package,directory structure：
              -Root
@@ -52,3 +52,10 @@ first you should install node_modules with **package.json** like zhis:
 after you finished this,u can use this script:
 
     python patch.py
+
+## Logic of diff  ##
+For every **jsbundle** in the project,i use [**google-diff-match-patch**](http://code.google.com/p/google-diff-match-patch/) (Copyright 2006 Google Inc.)to compute the diff of the old one and the new one.
+
+For every **Image** file in the project,i only put the image which has been changed or first add to the project.
+
+In the end,zip the diff floder for publish.
