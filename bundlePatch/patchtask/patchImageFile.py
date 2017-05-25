@@ -7,7 +7,7 @@ def compareImageFileWithPath(oldPath,newPath,desPath,childFloderName):
     oldEntirePath = os.path.join(oldPath,childFloderName)
     newEntirePath = os.path.join(newPath,childFloderName)
     desEntirePath = os.path.join(desPath,childFloderName)
-    if not os.path.isdir(oldEntirePath) or not os.path.isdir(newEntirePath):
+    if not os.path.isdir(newEntirePath): # not os.path.isdir(oldEntirePath) or
         return
     #创建目标目录
     os.system('rm -rf ' + desEntirePath)
