@@ -1,6 +1,6 @@
 #coding=utf-8
 
-from zipfile import *
+import os,zipfile
 
 # 压缩目录
 def zipFloder(pathIn,zipFileName):
