@@ -20,8 +20,8 @@ def compareJSFileWithPath(oldFilePath,newFilePath,patchFloderPath,jsNewFile):
             filePatch = file(patchFilePatth, "a+")
             filePatch.write(patchString)
             filePatch.close()
-            newFile.close()
-            oldFile.close()
+        newFile.close()
+        oldFile.close()
     else:
         # 移动新文件
         os.system('cp ' + newFilePath + ' ' + os.path.join(patchFloderPath, jsNewFile))

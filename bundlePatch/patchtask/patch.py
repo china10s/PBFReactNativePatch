@@ -44,10 +44,19 @@ Automatically pack reactnative jsbundle and different package,directory structur
 Version: 1.0
 """
 
-import os
+import os,json
 
 from patchJSBuild import *
 from patchCompare import *
+from patchZip import *
+
+# 生成 upgrade.json 文件
+def createUpgradeJson(jsonString,patchespath):
+    fileUpgradePath = patchespath+'/'+'upgrade.json'
+    os.system('touch '+fileUpgradePath)
+    upgradeFile = open(fileUpgradePath,'w')
+    upgradeFile.write(jsonString)
+    upgradeFile.close()
 
 # 主函数
 def main():
@@ -66,7 +75,6 @@ def main():
     if not os.path.isdir(patchesPath):
         os.system('mkdir -p ' + patchesPath)
 
-
     # 按照版本号放入
     print '输入本次发布的版本号:'
     newVerion = raw_input()
@@ -77,24 +85,44 @@ def main():
     if isAutoJsBundlePack == 'y':
         JSBuild()
 
-    # 打差异包
+    # 更新 bundles 目录
+    buildBundlePath = './build/'
+    newBundlePath = os.path.join(bundlesPath, newVerion)
+    os.system('rm -rf ' + newBundlePath)
+    cpBundleString = 'cp -r ' + buildBundlePath + ' ' + newBundlePath
+    os.system(cpBundleString)
+
+    upgradeJsonString = ""
+    upgradeJsonArry = []
+
+    # 1、打差异包
     for oldVersionFloder in os.listdir(bundlesPath):
         if oldVersionFloder == '.DS_Store':
             continue
         print '### ios '+oldVersionFloder+' 差异包生成中 ###'
         # 比较文件
-        compareWithPlatform('ios', oldVersionFloder,newVerion)
+        iosMd5 = compareWithPlatform('ios', oldVersionFloder,newVerion)
         print '### ios '+oldVersionFloder+' 差异包生成完成 ###'
         print '### android '+oldVersionFloder+' 差异包生成中 ###'
         # 比较文件
-        compareWithPlatform('android', oldVersionFloder,newVerion)
+        androidMd5 = compareWithPlatform('android', oldVersionFloder,newVerion)
         print '### android '+oldVersionFloder+' 差异包生成完成 ###'
+        # upgradeJson
+        patchFileName = oldVersionFloder+'-'+newVerion
+        upgradeJsonArry.append({'v':patchFileName,'iosBundleMd5':iosMd5,'androidBundleMd5':androidMd5,'filename':patchFileName+'.zip'})
 
-    # 更新 bundles 目录
-    buildBundlePath = './build/'
-    newBundlePath = os.path.join(bundlesPath,newVerion)
-    cpString = 'cp -r '+buildBundlePath +' '+newBundlePath
-    os.system(cpString)
+    # 2、打全量包到 patches 目录下
+    entireiOSMD5 = copyBundleZip(newBundlePath,patchesPath,'ios',newVerion)
+    entireAndroidMD5 = copyBundleZip(newBundlePath, patchesPath, 'android', newVerion)
+    upgradeJsonArry.append({
+            'v':newVerion, 'iosBundleMd5':entireiOSMD5, 'androidBundleMd5':entireAndroidMD5,'filename':newVerion+'.zip'})
+    upgradeJson = json.dumps(upgradeJsonArry)
+
+    # 3、生成 upgrade.json
+    patchesJsonPath = os.path.join(patchesPath, newVerion)
+    createUpgradeJson(upgradeJson,patchesJsonPath)
+
+    # 打开文件夹
     os.system('open ../bundles')
 
 main()
