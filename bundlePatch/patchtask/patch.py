@@ -61,6 +61,16 @@ def createUpgradeJson(jsonString,patchespath):
 # 主函数
 def main():
     reload(dmp_module)
+    # 按照版本号放入
+    print '输入本次发布的版本号:'
+    newVerion = raw_input()
+    newVerion = newVerion.replace('.', '_')
+
+    print '是否需要重新编译 jsbundle：n ? y'
+    isAutoJsBundlePack = raw_input()
+    if isAutoJsBundlePack == 'y':
+        JSBuild()
+
     # 获取当前脚本目录
     currentPath = os.getcwd()
     # 获取工作目录
@@ -75,29 +85,20 @@ def main():
     if not os.path.isdir(patchesPath):
         os.system('mkdir -p ' + patchesPath)
 
-    # 按照版本号放入
-    print '输入本次发布的版本号:'
-    newVerion = raw_input()
-    newVerion = newVerion.replace('.', '_')
-
-    print '是否需要重新编译 jsbundle：n ? y'
-    isAutoJsBundlePack = raw_input()
-    if isAutoJsBundlePack == 'y':
-        JSBuild()
-
-    # 更新 bundles 目录
-    buildBundlePath = './build/'
-    newBundlePath = os.path.join(bundlesPath, newVerion)
-    os.system('rm -rf ' + newBundlePath)
-    cpBundleString = 'cp -r ' + buildBundlePath + ' ' + newBundlePath
-    os.system(cpBundleString)
+    #初始化 patches 地址
+    patchFVersionPath = '../patches/'+newVerion+'/'+'ios'
+    os.system('rm -rf '+patchFVersionPath)
+    os.system('mkdir -p '+patchFVersionPath)
+    patchFVersionPath = '../patches/' + newVerion + '/' + 'android'
+    os.system('rm -rf ' + patchFVersionPath)
+    os.system('mkdir -p ' + patchFVersionPath)
 
     upgradeJsonString = ""
     upgradeJsonArry = []
 
     # 1、打差异包
     for oldVersionFloder in os.listdir(bundlesPath):
-        if oldVersionFloder == '.DS_Store':
+        if oldVersionFloder == '.DS_Store' or oldVersionFloder == '.svn' or oldVersionFloder == '.git':
             continue
         print '### ios '+oldVersionFloder+' 差异包生成中 ###'
         # 比较文件
@@ -110,6 +111,13 @@ def main():
         # upgradeJson
         patchFileName = oldVersionFloder+'-'+newVerion
         upgradeJsonArry.append({'v':patchFileName,'iosBundleMd5':iosMd5,'androidBundleMd5':androidMd5,'filename':patchFileName+'.zip'})
+
+    # 更新 bundles 目录
+    buildBundlePath = './build/'
+    newBundlePath = os.path.join(bundlesPath, newVerion)
+    os.system('rm -rf ' + newBundlePath)
+    cpBundleString = 'cp -r ' + buildBundlePath + ' ' + newBundlePath
+    os.system(cpBundleString)
 
     # 2、打全量包到 patches 目录下
     entireiOSMD5 = copyBundleZip(newBundlePath,patchesPath,'ios',newVerion)
